@@ -1,59 +1,60 @@
 import tkinter as tk
 from ui.modules.currency_tracker import CurrencyTrackerModule
+from ui.modules.finance_tracker import FinanceTrackerModule  # Подключаем новый модуль
 from ui.modules.stubs import StubModule
 
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Python SuperApp v1.0")
-        self.geometry("900x600")
-        self.minimum_size = (800, 500)
+        self.title("Python SuperApp v1.1")
+        self.geometry("1000x650")  # Слегка увеличим окно под расширенный интерфейс
+        self.minsize(900, 600)
         
-        # Макет: Боковое меню + Контентная область
-        self.sidebar = tk.Frame(self, bg="#212529", width=200)
+        # Разметка: Боковое меню + Контентная область
+        self.sidebar = tk.Frame(self, bg="#212529", width=220)
         self.sidebar.pack(side="left", fill="y")
         self.sidebar.pack_propagate(False)
         
         self.container = tk.Frame(self, bg="#f0f2f5")
         self.container.pack(side="right", fill="both", expand=True)
         
-        # Хранилище активных модулей
         self.modules = {}
         self.active_module = None
         
         self.build_sidebar()
         self.init_modules()
         
-        # По умолчанию открываем первую утилиту
+        # По умолчанию открываем валюты
         self.show_module("currency")
 
     def build_sidebar(self):
-        # Логотип / Название приложения
         logo = tk.Label(self.sidebar, text="⚡ SUPERAPP", bg="#212529", fg="#ffffff", font=("Arial", 14, "bold"), pady=20)
         logo.pack(fill="x")
         
-        # Настройки стилей кнопок меню
-        btn_style = {"bg": "#343a40", "fg": "white", "relief": "flat", "activebackground": "#495057", "activeforeground": "white", "anchor": "w", "padx": 15, "pady": 10, "font": ("Arial", 10)}
+        btn_style = {
+            "bg": "#343a40", "fg": "white", "relief": "flat", 
+            "activebackground": "#495057", "activeforeground": "white", 
+            "anchor": "w", "padx": 15, "pady": 10, "font": ("Arial", 10)
+        }
         
-        # Кнопки переключения
+        # Кнопки навигации
         tk.Button(self.sidebar, text="📊 Мониторинг Валют", command=lambda: self.show_module("currency"), **btn_style).pack(fill="x", pady=1)
-        tk.Button(self.sidebar, text="🛠 Утилита 2 (Заглушка)", command=lambda: self.show_module("stub2"), **btn_style).pack(fill="x", pady=1)
-        tk.Button(self.sidebar, text="🛠 Утилита 3 (Заглушка)", command=lambda: self.show_module("stub3"), **btn_style).pack(fill="x", pady=1)
-        tk.Button(self.sidebar, text="🛠 Утилита 4 (Заглушка)", command=lambda: self.show_module("stub4"), **btn_style).pack(fill="x", pady=1)
-        tk.Button(self.sidebar, text="🛠 Утилита 5 (Заглушка)", command=lambda: self.show_module("stub5"), **btn_style).pack(fill="x", pady=1)
+        tk.Button(self.sidebar, text="💰 Управление Бюджетом", command=lambda: self.show_module("finance"), **btn_style).pack(fill="x", pady=1)
+        for i in range(3, 6):
+            tk.Button(self.sidebar, text=f"🛠 Утилита {i} (Заглушка)", command=lambda: self.show_module(f"stub{i}"), **btn_style).pack(fill="x", pady=1)
 
     def init_modules(self):
-        # Инициализируем полноценный модуль курса валют
+        # Реальные модули
         self.modules["currency"] = CurrencyTrackerModule(self.container, self)
+        self.modules["finance"] = FinanceTrackerModule(self.container, self) # Инициализируем бюджет
         
-        # Инициализируем заглушки под будущие модули недели
-        for i in range(2, 6):
+        # Оставшиеся заглушки
+        for i in range(3, 6):
             stub = StubModule(self.container, self)
             stub.set_title(f"Утилита №{i}\n(Модуль находится на стадии разработки)")
             self.modules[f"stub{i}"] = stub
 
     def show_module(self, name):
-        """Скрывает текущий модуль и отображает выбранный."""
         if self.active_module:
             self.active_module.pack_forget()
             
